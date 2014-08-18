@@ -57,7 +57,7 @@ jQuery(document).ready(function($){
         var conn = new RTCPeerConnection(configuration);
 
         // creating a websocket between browser and signaling server
-        var socket = io.connect('http://localhost:3000'); // local URL
+        var socket = io.connect(window.location.origin); // local URL
         //var socket = io.connect('http://localhost:3000'); // heroku URL
 
         // sending room id to signaling server

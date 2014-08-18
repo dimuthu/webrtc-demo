@@ -5,8 +5,9 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
-server.listen(3000); // for localhost testing
-//server.listen(80); // for heroku server
+
+var port = Number(process.env.PORT || 3000);
+server.listen(port);
 
 // send home page to client
 app.get('/', function (req, res) {
