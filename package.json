@@ -1,7 +1,7 @@
 {
   "name": "WebRTC demo",
   "author": "Dimuthu Nilanka",
-  "description": "This is a WebRTC demo application created for ISM APAC TeckTalk presentation on 20th Aug 2014."
+  "description": "This is a WebRTC demo application created for ISM APAC TeckTalk presentation on 20th Aug 2014.",
   "version": "0.0.1",
   "main": "app.js",
   "scripts": {
