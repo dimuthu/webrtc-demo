@@ -1,0 +1,162 @@
+/*
+*   Project: WebRTC Demo Application for ISM APAC TeckTalk
+*   Date: 20 Aug 2014
+*   Author: Dimuthu Nilanka <dimuthu.nilanka@gamil.com>
+*/
+
+/*
+*  Fonts
+*/
+
+@font-face {
+    font-family: 'fff_tusjbold';
+    src: url('../fonts/FFF_Tusj-webfont.eot');
+    src: url('../fonts/FFF_Tusj-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/FFF_Tusj-webfont.woff') format('woff'),
+         url('../fonts/FFF_Tusj-webfont.ttf') format('truetype'),
+         url('../fonts/FFF_Tusj-webfont.svg#fff_tusjbold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+h1 {
+    font-family: 'fff_tusjbold', sans-serif;
+    font-size: 70px;
+    font-weight: normal;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 rgba(81, 203, 238, 1);
+    border: 1px solid #354F00;
+    outline: none;
+}
+
+input[type="text"]::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #354F00;
+}
+input[type="text"]:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #354F00;
+    opacity:  1;
+}
+input[type="text"]::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #354F00;
+    opacity:  1;
+}
+
+.action-button {
+    display: block;
+    color: #D4EE9F;
+    border: 1px solid #D4EE9F;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.action-button:hover {
+    text-decoration: none;
+    color: #354F00;
+    background: #A5C663;
+    border: 1px solid #354F00;
+    border-bottom: 3px solid #354F00;
+}
+
+.action-input {
+    display: block;
+    color: #354F00;
+    border: 1px solid #D4EE9F;
+    line-height: 32px;
+    height: 72px;
+    border-radius: 8px;
+    text-align: center;
+    padding: 20px;
+    font-size: 20px;
+    background: #7A9F35;
+    margin-bottom: 20px;
+}
+
+body.home {
+    background: #7A9F35;
+    padding-top: 50px;
+}
+
+.home h1 {
+    text-align: center;
+}
+
+.home h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.home h3 {
+    text-align: center;
+}
+
+.home .start-call-wrapper {
+    padding-top: 48px;
+}
+
+.home .or-wrapper {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.home .join-call-wrapper {
+    padding-bottom: 48px;
+}
+
+body.room {
+    background: #7A9F35;
+    padding-top: 50px;
+}
+
+.room h1 {
+    text-align: center;
+}
+
+.room h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.room h3 {
+    text-align: center;
+}
+
+.room #caller-video {
+    width: 360px;
+    height: 270px;
+    background: #222;
+    margin-bottom: 20px;
+}
+
+.room #answer-video {
+    width: 750px;
+    height: 562px;
+    background: #222;
+}
+
+.room #stop-call {
+    display: none;
+}
+
+.room .content {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.room #stop-call:hover {
+    color: #550000;
+    border-color: #550000;
+    background: #D46A6A;
+}
+
+footer p {
+    display: block;
+    text-align: center;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebRTC demo app</title>
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/font-awesome.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="home">
+  <section class="container">
+    <header>
+      <h1>WebRTC Demo</h1>
+      <h2>for ISM APAC TeckTalk</h2>
+    </header>
+    <section class="row">
+      <div class="col-md-4 col-md-offset-4 start-call-wrapper">
+        <a href="#" id="start-new" class="action-button"><i class="fa fa-phone-square"></i> Start A New Conversation</a>
+      </div>
+    </section>
+    <section class="row">
+      <div class="col-md-4 col-md-offset-4 or-wrapper">
+        <h3>- OR -</h3>
+      </div>
+    </section>
+    <section class="row">
+      <div class="col-md-4 col-md-offset-4 room-id-wrapper">
+        <input type="text" id="room-id-input" class="form-control action-input" placeholder="Room ID">
+      </div>
+    </section>
+    <section class="row">
+      <div class="col-md-4 col-md-offset-4 join-call-wrapper">
+        <a href="#" id="join-call" class="action-button"><i class="fa fa-weixin"></i> Join to a Call</a>
+      </div>
+    </section>
+    <footer class="row">
+      <div class="col-md-12">
+        <p>WebRTC Demo application for ISM APAC TechTalk by Dimuthu Nilanka</p>
+      </div>
+    </footer>
+  </section>
+<div class="modal fade" id="start-call-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="go-to-room">Start a New Conversation</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          Please, share following Room ID with your callee and Enjoy your call :)
+        </p>
+        <h3 id="room-id-label">Room ID</h3>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="go-to-room-button" class="btn btn-primary">Go To Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/adapter.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

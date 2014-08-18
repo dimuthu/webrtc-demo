@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebRTC demo app</title>
+
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/css/font-awesome.css" rel="stylesheet">
+  <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="room">
+  <section class="container">
+    <header>
+      <h1>WebRTC Demo</h1>
+      <h2>for ISM APAC TeckTalk</h2>
+    </header>
+    <section class="row content">
+      <div class="col-md-8">
+        <video autoplay="true" muted="true" id="answer-video"></video>
+      </div>
+      <div class="col-md-4">
+        <div class="row">
+          <div class="col-md-12">
+            <video autoplay="true" muted="true" id="caller-video"></video>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <a href="javascript:void(0);" id="start-call" class="action-button"><i class="fa fa-phone-square"></i> Start the Call</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <a href="javascript:void(0);" id="stop-call" class="action-button"><i class="fa fa-ban"></i> Stop the Call</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer class="row">
+      <div class="col-md-12">
+        <p>WebRTC Demo application for ISM APAC TechTalk by Dimuthu Nilanka</p>
+      </div>
+    </footer>
+  </section>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/adapter.js"></script>
+  <script src="/js/script.js"></script>
+</body>
+</html>

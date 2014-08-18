@@ -1,59 +1,65 @@
 var express = require('express');
+var app = require('express')();
 var path = require('path');
-var favicon = require('static-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
-var app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-app.use(favicon());
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+server.listen(3000); // for localhost testing
+//server.listen(80); // for heroku server
 
-app.use('/', routes);
-app.use('/users', users);
-
-/// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
+// send home page to client
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/views/index.html');
 });
 
-/// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+// room route handler
+app.get('/room/:roomId', function (req, res) {
+  res.sendfile(__dirname + '/views/room.html');
 });
 
+// starting websocket via socket.io
+io.on('connection', function (socket) {
 
-module.exports = app;
+    // waiting for room callback to join users to related rooms
+    socket.on('room', function(room){
+        // getting currently connected clients
+        var clients = io.sockets.adapter.rooms[room];
+
+        // if there is a users in the room
+        if(clients != undefined){
+            // get the already connected user for the related room
+            var connectedUserCount = Object.keys(clients).length;
+            // if a user is waiting in the room, we send message to him informing about new user has connected to the room.
+            if(connectedUserCount == 1){
+                // join the current user to room
+                socket.join(room);
+                // send message to other party who is waiting for a candidate
+                socket.broadcast.to(room).emit('new_user_connected', { new_user_connected: true });
+
+            // room already have two users joined in so we reject connecting user and send him a message
+            }else if(connectedUserCount > 1){
+                socket.emit('room_full', { room_full: true });
+            }
+
+        // no any users in the room, we join current user to related room
+        }else {
+            socket.join(room);
+        }
+    });
+
+    // exchanging start call message
+    socket.on('call', function (data) {
+        socket.broadcast.to(data.room_id).emit('call_' + data.room_id, data);
+    });
+
+    // exchanging answer call message
+    socket.on('answer', function(data){
+        socket.broadcast.to(data.room_id).emit('answer_' + data.room_id, data);
+    });
+
+    // exchanging stop call message
+    socket.on('connection_closed', function(data){
+        socket.broadcast.to(data.room_id).emit('connection_closed_' + data.room_id, data);
+    });
+});
