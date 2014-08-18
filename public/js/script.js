@@ -52,10 +52,6 @@ jQuery(document).ready(function($){
           },
           {
             'url' : 'stun:stun.iptel.org'
-          },
-          {
-            'url': 'turn:homeo@turn.bistri.com:80',
-            'credential': 'homeo'
           }
           ]
         };
