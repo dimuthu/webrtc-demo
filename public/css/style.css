@@ -79,6 +79,15 @@ input[type="text"]::-moz-placeholder { /* Mozilla Firefox 19+ */
     margin-bottom: 20px;
 }
 
+footer a {
+    color: #333;
+    text-decoration: underline;
+}
+
+footer a:hover {
+    color: #000;
+}
+
 body.home {
     background: #7A9F35;
     padding-top: 50px;
