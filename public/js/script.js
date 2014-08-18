@@ -40,7 +40,19 @@ jQuery(document).ready(function($){
         var configuration = {
           'iceServers': [{
             'url': 'stun:stun.l.google.com:19302'
-          }
+          },
+          {
+            'url' : 'stun:stun1.l.google.com:19302'
+          },
+          {
+            'url' : 'stun:stun.ekiga.net'
+          },
+          {
+            'url' : 'stun:stun.ideasip.com'
+          },
+          {
+            'url' : 'stun:stun.iptel.org'
+          },
           ]
         };
 
