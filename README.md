@@ -9,7 +9,7 @@ http://obscure-plains-2796.herokuapp.com/
 
 To run the application:
 -----------------------
-$git clone https://github.com/dimuthu/webrtc-demo.git webrtc-demo
-$cd webrtc-demo || npm install
-$node app.js
+1. $git clone https://github.com/dimuthu/webrtc-demo.git webrtc-demo
+2. $cd webrtc-demo || npm install
+3. $node app.js
 
