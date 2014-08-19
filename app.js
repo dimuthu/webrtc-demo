@@ -33,6 +33,7 @@ io.on('connection', function (socket) {
             var connectedUserCount = Object.keys(clients).length;
             // if a user is waiting in the room, we send message to him informing about new user has connected to the room.
             if(connectedUserCount == 1){
+                console.log('join to room:' + room);
                 // join the current user to room
                 socket.join(room);
                 // send message to other party who is waiting for a candidate
@@ -45,6 +46,7 @@ io.on('connection', function (socket) {
 
         // no any users in the room, we join current user to related room
         }else {
+            console.log('join to room:' + room);
             socket.join(room);
         }
     });
@@ -52,15 +54,26 @@ io.on('connection', function (socket) {
     // exchanging start call message
     socket.on('call', function (data) {
         socket.broadcast.to(data.room_id).emit('call_' + data.room_id, data);
+        console.log('call:' + data);
     });
 
     // exchanging answer call message
     socket.on('answer', function(data){
         socket.broadcast.to(data.room_id).emit('answer_' + data.room_id, data);
+        console.log('answer:' + data);
     });
 
     // exchanging stop call message
     socket.on('connection_closed', function(data){
         socket.broadcast.to(data.room_id).emit('connection_closed_' + data.room_id, data);
+        console.log('connection_closed:' + data);
     });
+
+    // exchanging stop call message
+    socket.on('ice_canditate', function(data){
+        socket.broadcast.to(data.room_id).emit('ice_canditate_' + data.room_id, data);
+        console.log('ice_canditate:' + data);
+    });
+
+
 });

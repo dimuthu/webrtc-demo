@@ -38,21 +38,10 @@ jQuery(document).ready(function($){
 
         // Here we listing down some free STUN/TURN servers
         var configuration = {
-          'iceServers': [{
-            'url': 'stun:stun.l.google.com:19302'
-          },
-          {
-            'url' : 'stun:stun1.l.google.com:19302'
-          },
-          {
-            'url' : 'stun:stun.ekiga.net'
-          },
-          {
-            'url' : 'stun:stun.ideasip.com'
-          },
-          {
-            'url' : 'stun:stun.iptel.org'
-          }
+          'iceServers': [
+            {url: "stun:23.21.150.121"},
+            {url: "stun:stun.l.google.com:19302"},
+            {url: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
           ]
         };
 
@@ -65,8 +54,15 @@ jQuery(document).ready(function($){
             }
         };
 
+       var options = {
+            optional: [
+                {DtlsSrtpKeyAgreement: true},
+                {RtpDataChannels: true} //required for Firefox
+            ]
+        };
+
         // creating a new Peer2Peer Connection
-        var conn = new RTCPeerConnection(configuration);
+        var conn = null;
 
         // creating a websocket between browser and signaling server
         var socket = io.connect(window.location.origin); // local URL
@@ -88,6 +84,10 @@ jQuery(document).ready(function($){
 
         // start call button click event handler
         $('#start-call').on('click', function(){
+            conn = new RTCPeerConnection(configuration, options);
+            conn.onicecandidate = onIceCandidateHandler;
+            conn.onaddstream = onAddStreamHandler;
+
             var callerVideo = $('#caller-video');
             // polyfill for getting user media
             getUserMedia(
@@ -128,6 +128,10 @@ jQuery(document).ready(function($){
 
         // this event waiting for call to start by other party
         socket.on('call_' + roomId, function (data) {
+            console.log('call_'+roomId + '::' + data);
+            conn = new RTCPeerConnection(configuration, options);
+            conn.onicecandidate = onIceCandidateHandler;
+            conn.onaddstream = onAddStreamHandler;
 
             var callerVideo = $('#caller-video');
 
@@ -175,17 +179,46 @@ jQuery(document).ready(function($){
 
         // event for receiving answering party's answer via signaling server
         socket.on('answer_' + roomId, function(data){
+            console.log('answer_'+roomId + '::' + data);
             var remoteDescription = new RTCSessionDescription(data.answerSDP);
             conn.setRemoteDescription(remoteDescription);
         });
 
         // event handler for remote stream add event
-        conn.onaddstream = function(stream) {
+        function onAddStreamHandler(stream) {
             // here we are adding remote video stream to answer video element
-            var answerVideo = document.getElementById('answer-video');
+            var answerVideo = $('#answer-video');
             // polyfill for adding media stream
-            attachMediaStream(answerVideo, stream.stream);
+            console.log(stream);
+            if(window.URL){
+                answerVideo.attr('src', window.URL.createObjectURL(stream.stream));
+            }else{
+                answerVideo.attr('src', stream.stream);
+            }
+            // attachMediaStream(answerVideo, stream.stream);
         };
+
+        // event handler for remote stream add event
+        function onIceCandidateHandler(event) {
+            var candidate = event.candidate;
+            if(candidate) {
+                socket.emit('ice_canditate', {candidate: candidate, room_id: roomId});
+            }
+        };
+
+        socket.on('ice_canditate_'+ roomId, function(data){
+            console.log('ice_candidate_'+roomId + '::' + data);
+            if(data.candidate){
+                var candidate     = data.candidate.candidate;
+                var sdpMLineIndex = data.candidate.sdpMLineIndex;
+                var iceCandidate = new RTCIceCandidate({
+                    sdpMLineIndex: sdpMLineIndex,
+                    candidate    : candidate
+                });
+                console.log(iceCandidate);
+                conn.addIceCandidate(iceCandidate);
+            }
+        });
 
         // stop calling button click event handler
         $('#stop-call').on('click', function(){
@@ -203,6 +236,7 @@ jQuery(document).ready(function($){
 
         // listing to other party's connection close event
         socket.on('connection_closed_' + roomId, function(data){
+            console.log('connection_closed_'+roomId + '::' + data);
             // closing P2P connection from our side too
             conn.close();
             // Reset and update UI
