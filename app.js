@@ -28,25 +28,23 @@ io.on('connection', function (socket) {
         var clients = io.sockets.adapter.rooms[room];
 
         // if there is a users in the room
-        if(clients != undefined){
+        if(clients !== undefined) {
             // get the already connected user for the related room
             var connectedUserCount = Object.keys(clients).length;
             // if a user is waiting in the room, we send message to him informing about new user has connected to the room.
-            if(connectedUserCount == 1){
-                console.log('join to room:' + room);
+            if(connectedUserCount == 1) {
                 // join the current user to room
                 socket.join(room);
                 // send message to other party who is waiting for a candidate
                 socket.broadcast.to(room).emit('new_user_connected', { new_user_connected: true });
 
-            // room already have two users joined in so we reject connecting user and send him a message
-            }else if(connectedUserCount > 1){
+                // room already have two users joined in so we reject connecting user and send him a message
+            } else if(connectedUserCount > 1) {
                 socket.emit('room_full', { room_full: true });
             }
 
         // no any users in the room, we join current user to related room
-        }else {
-            console.log('join to room:' + room);
+        } else {
             socket.join(room);
         }
     });
@@ -54,26 +52,21 @@ io.on('connection', function (socket) {
     // exchanging start call message
     socket.on('call', function (data) {
         socket.broadcast.to(data.room_id).emit('call_' + data.room_id, data);
-        console.log('call:' + data);
     });
 
     // exchanging answer call message
     socket.on('answer', function(data){
         socket.broadcast.to(data.room_id).emit('answer_' + data.room_id, data);
-        console.log('answer:' + data);
     });
 
     // exchanging stop call message
-    socket.on('connection_closed', function(data){
-        socket.broadcast.to(data.room_id).emit('connection_closed_' + data.room_id, data);
-        console.log('connection_closed:' + data);
+    socket.on('stream_closed', function(data){
+        socket.broadcast.to(data.room_id).emit('stream_closed_' + data.room_id, data);
     });
 
-    // exchanging stop call message
+    // exchanging ice candidates call message
     socket.on('ice_canditate', function(data){
         socket.broadcast.to(data.room_id).emit('ice_canditate_' + data.room_id, data);
-        console.log('ice_canditate:' + data);
     });
-
 
 });

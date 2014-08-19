@@ -5,9 +5,9 @@ jQuery(document).ready(function($){
         // click event on start new conversation button
         $('#start-new').on('click', function(e){
             e.preventDefault();
-            // creating a random string and add it to modal dialog
+            // creating a random string and add it to modal dialogue
             $('#room-id-label').html(Math.random().toString(36).substr(2, 6));
-            // show the bootstrap modal dialog
+            // show the bootstrap modal dialogue
             $('#start-call-modal').modal();
         });
 
@@ -27,11 +27,12 @@ jQuery(document).ready(function($){
                 // user is redirecting to related room URL
                 window.location = window.location + 'room/' + roomId;
             }
-        })
+        });
     }
 
     // chat room scripts goes here
     if($('body').hasClass('room')){
+
         var currentUrl = window.location.pathname; // get current URL
         // extracting room id from the URL
         var roomId = currentUrl.substr(currentUrl.lastIndexOf('/') + 1);
@@ -45,7 +46,7 @@ jQuery(document).ready(function($){
           ]
         };
 
-        // sdp settings object
+        // SDP settings object
         var sdpConstraints = {
             optional: [],
             mandatory: {
@@ -56,158 +57,44 @@ jQuery(document).ready(function($){
 
        var options = {
             optional: [
-                {DtlsSrtpKeyAgreement: true},
-                {RtpDataChannels: true} //required for Firefox
+                { DtlsSrtpKeyAgreement: true },
+                { RtpDataChannels: true } //required for Firefox
             ]
         };
 
-        // creating a new Peer2Peer Connection
-        var conn = null;
+        var localStream = null;
 
-        // creating a websocket between browser and signaling server
-        var socket = io.connect(window.location.origin); // local URL
-        //var socket = io.connect('http://localhost:3000'); // heroku URL
+        // creating a web-socket between browser and signalling server
+        var socket = io.connect(window.location.origin);
 
-        // sending room id to signaling server
+        // sending room id to signalling server
         socket.emit('room', roomId);
 
-        // room full event handler
+        // room full message handler
         socket.on('room_full', function(data){
             alert('Sorry, room is full.');
             window.location = '/';
         });
 
-        // this event waiting for new user to connect and show a message when user connected
+        // waiting for new user to connect and show a message when user connected
         socket.on('new_user_connected', function(data){
-            alert('New user has connected to your room. Please start the call.');
+            alert('A new user has connected to your room. Please start the call.');
         });
 
-        // start call button click event handler
-        $('#start-call').on('click', function(){
-            conn = new RTCPeerConnection(configuration, options);
-            conn.onicecandidate = onIceCandidateHandler;
-            conn.onaddstream = onAddStreamHandler;
+        // creating a new Peer2Peer Connection
+        var conn = new RTCPeerConnection(configuration, options);
 
-            var callerVideo = $('#caller-video');
-            // polyfill for getting user media
-            getUserMedia(
-                {audio: true, video: true},
-                function(stream){
-                    if (window.URL) {
-                        // add local video stream to small video element
-                        callerVideo.attr('src', window.URL.createObjectURL(stream));
-                        // add local video stream to P2P connection
-                        conn.addStream(stream);
-                    } else {
-                        // add local video stream to small video element
-                        callerVideo.attr('src', stream);
-                        // add local video stream to P2P connection
-                        conn.addStream(stream);
-                    }
-
-                    // create a offer request and send it to other party via signaling server
-                    conn.createOffer(function(offerSDP) {
-                        conn.setLocalDescription(offerSDP);
-                        // send message to signaling server via websocket
-                        socket.emit('call', { offerSDP: offerSDP, room_id: roomId });
-                    },
-                    function(error){
-                     console.log(error);
-                    },
-                    sdpConstraints);
-
-                    // update UI button views
-                    $('#start-call').hide();
-                    $('#stop-call').css('display', 'block');
-                },
-                function(error){
-                    console.log(error);
-                }
-            );
-        });
-
-        // this event waiting for call to start by other party
-        socket.on('call_' + roomId, function (data) {
-            console.log('call_'+roomId + '::' + data);
-            conn = new RTCPeerConnection(configuration, options);
-            conn.onicecandidate = onIceCandidateHandler;
-            conn.onaddstream = onAddStreamHandler;
-
-            var callerVideo = $('#caller-video');
-
-            // polyfill for getting user media
-            getUserMedia(
-                {audio: true, video: true},
-                function(stream){
-                    if (window.URL) {
-                        // add local video stream to small video element
-                        callerVideo.attr('src', window.URL.createObjectURL(stream));
-                        // add local video stream to P2P connection
-                        conn.addStream(stream);
-                    } else {
-                        // add local video stream to small video element
-                        callerVideo.attr('src', stream);
-                        // add local video stream to P2P connection
-                        conn.addStream(stream);
-                    }
-
-                    // get the offer from P2P calling party
-                    var remoteDescription = new RTCSessionDescription(data.offerSDP);
-                    conn.setRemoteDescription(remoteDescription);
-
-                    // send the answer to P2P calling party via signaling server
-                    conn.createAnswer(function(answerSDP) {
-                        conn.setLocalDescription(answerSDP);
-                        // send message to signaling server via websocket
-                        socket.emit('answer', {answerSDP: answerSDP, room_id: roomId });
-                    },
-                    function (error){
-                        console.log(error);
-                    },
-                    sdpConstraints);
-
-                    // update UI button views
-                    $('#start-call').hide();
-                    $('#stop-call').css('display', 'block');
-                },
-                function(error){
-                    console.log(error);
-                }
-            );
-
-        });
-
-        // event for receiving answering party's answer via signaling server
-        socket.on('answer_' + roomId, function(data){
-            console.log('answer_'+roomId + '::' + data);
-            var remoteDescription = new RTCSessionDescription(data.answerSDP);
-            conn.setRemoteDescription(remoteDescription);
-        });
-
-        // event handler for remote stream add event
-        function onAddStreamHandler(stream) {
-            // here we are adding remote video stream to answer video element
-            var answerVideo = $('#answer-video');
-            // polyfill for adding media stream
-            console.log(stream);
-            if(window.URL){
-                answerVideo.attr('src', window.URL.createObjectURL(stream.stream));
-            }else{
-                answerVideo.attr('src', stream.stream);
-            }
-            // attachMediaStream(answerVideo, stream.stream);
-        };
-
-        // event handler for remote stream add event
-        function onIceCandidateHandler(event) {
+        // event handler for ICECandidates
+        conn.onicecandidate = function(event) {
             var candidate = event.candidate;
+            // send ICE candidates to the remote side via signalling
             if(candidate) {
                 socket.emit('ice_canditate', {candidate: candidate, room_id: roomId});
             }
         };
 
+        // when receiving ICECandidates from remote end via signalling we will add them to local peer connection
         socket.on('ice_canditate_'+ roomId, function(data){
-            console.log('ice_candidate_'+roomId + '::' + data);
             if(data.candidate){
                 var candidate     = data.candidate.candidate;
                 var sdpMLineIndex = data.candidate.sdpMLineIndex;
@@ -215,30 +102,95 @@ jQuery(document).ready(function($){
                     sdpMLineIndex: sdpMLineIndex,
                     candidate    : candidate
                 });
-                console.log(iceCandidate);
                 conn.addIceCandidate(iceCandidate);
             }
         });
 
+        // event handler for remote stream add event
+        conn.onaddstream = function(event) {
+            // here we are adding remote video stream to answer video element
+            var answerVideo = document.getElementById('answer-video');
+            // poly-fill for adding media stream
+            attachMediaStream(answerVideo, event.stream);
+        };
+
+        // getting user media and add it to peer connection
+        getUserMedia(
+            {audio: true, video: true},
+            function(stream){
+                var callerVideo = document.getElementById('caller-video');
+                localStream = stream;
+                attachMediaStream(callerVideo, localStream);
+                conn.addStream(localStream);
+            },
+            function(error){
+                console.log(error);
+            }
+        );
+
+        // start call button click event handler
+        $('#start-call').on('click', function(){
+            // create a offer request and send it to other party via signalling server
+            conn.createOffer(function(offerSDP) {
+                conn.setLocalDescription(offerSDP);
+                // send message to signalling server via web-socket
+                socket.emit('call', { offerSDP: offerSDP, room_id: roomId });
+            },
+            function(error){
+             console.log(error);
+            },
+            sdpConstraints);
+
+            // update UI button views
+            $('#start-call').hide();
+            $('#stop-call').css('display', 'block');
+        });
+
+        // this event waiting for call to start by other party
+        socket.on('call_' + roomId, function (data) {
+            var remoteDescription = new RTCSessionDescription(data.offerSDP);
+            conn.setRemoteDescription(remoteDescription);
+
+            // send the answer to P2P calling party via signalling server
+            conn.createAnswer(function(answerSDP) {
+                conn.setLocalDescription(answerSDP);
+                // send message to signalling server via web-socket
+                socket.emit('answer', {answerSDP: answerSDP, room_id: roomId });
+            },
+            function (error){
+                console.log(error);
+            },
+            sdpConstraints);
+
+            // update UI button views
+            $('#start-call').hide();
+            $('#stop-call').css('display', 'block');
+        });
+
+        // event for receiving answering party's answer via signalling server
+        socket.on('answer_' + roomId, function(data){
+            var remoteDescription = new RTCSessionDescription(data.answerSDP);
+            conn.setRemoteDescription(remoteDescription);
+        });
+
         // stop calling button click event handler
         $('#stop-call').on('click', function(){
-            // closing the P2P connection
-            conn.close();
+            // stop local video stream and send the message to other party via signalling
+            localStream.stop();
+            socket.emit('stream_closed', { room_id: roomId });
+
             // Reset and update UI
             $('#caller-video').attr('src', '');
             $('#answer-video').attr('src', '');
             $('#start-call').css('display', 'block');
             $('#stop-call').hide();
-
-            // send stop calling information to other party via signaling server
-            socket.emit('connection_closed', { room_id: roomId });
         });
 
         // listing to other party's connection close event
-        socket.on('connection_closed_' + roomId, function(data){
-            console.log('connection_closed_'+roomId + '::' + data);
-            // closing P2P connection from our side too
-            conn.close();
+        socket.on('stream_closed_' + roomId, function(data){
+            // stop localStream
+            localStream.stop();
+
             // Reset and update UI
             $('#caller-video').attr('src', '');
             $('#answer-video').attr('src', '');
