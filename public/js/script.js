@@ -41,7 +41,7 @@ jQuery(document).ready(function($){
           'iceServers': [
             {url: "stun:23.21.150.121"},
             {url: "stun:stun.l.google.com:19302"},
-            {url: "turn:numb.viagenie.ca", credential: "webrtcdemo", username: "louis%40mozilla.com"}
+            {url: "turn:numb.viagenie.ca", credential: "colombo", username: "dimuthu.nilanka@gmail.com"}
           ]
         };
 
